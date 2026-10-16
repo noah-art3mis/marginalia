@@ -9,7 +9,7 @@ Marginalia is in the design stage. There is no installable plugin yet. Follow th
 1. Start with a large, loosely structured Markdown draft. Ask an agent to propose headings, then classify and move existing passages beneath the agreed headings without rewriting their content.
 2. Choose an editing pass, such as cleanup, tightening, compaction, or translation. Add a short editorial brief describing the intended voice, permitted changes, and content to preserve.
 3. Work through the document at your own pace. The agent proposes changes; you inspect, discuss, accept, or reject them. Planned review modes include plain-Markdown proposals and an interactive diff.
-4. Save a recoverable version of the document text at an author-controlled iteration boundary.
+4. Use Versions to start, resume, or finish a pass, compare saved text, and recover earlier text. Save recoverable document text at author-controlled pass boundaries.
 
 A paragraph rewrite can be one proposal accepted or rejected as a whole. Accepting a proposal and then editing the resulting text is sufficient. Removing substantive information, including examples and qualifications, requires explicit approval separate from accepting wording changes.
 

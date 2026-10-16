@@ -4,8 +4,8 @@ Terms for an author revising a document through deliberate passes with an agent'
 
 ## Language
 
-**Iteration**:
-One author-controlled pass from the start of a document to its finish. The author may stop and resume during the pass.
+**Pass**:
+One author-controlled traversal from the start of a document to its finish, also called an iteration. The author may stop and resume during the pass. A pass describes the editing work; a saved version preserves document text at a boundary of that work.
 _Avoid_: Generation, message, individual edit
 
 **Proposal**:
@@ -13,7 +13,7 @@ An agent's suggested change that the author can inspect and discuss before decid
 _Avoid_: Applied edit, automatic rewrite
 
 **Pass type**:
-The purpose guiding an iteration, such as compacting, tightening, translating, or cleaning up. The author directs the agent’s edits during the pass.
+The purpose guiding a pass, such as compacting, tightening, translating, or cleaning up. The author directs the agent’s edits during the pass.
 
 **Information cut**:
 A proposed removal of a claim, example, qualification, uncertainty, or other substantive content. It requires explicit approval distinct from accepting wording changes.
@@ -29,7 +29,7 @@ The work of agreeing on headings and placing passages under them before prose ed
 A proposed relocation of an unchanged passage from its current position to a destination in the agreed outline. The author can inspect the passage and decide whether to accept the move.
 
 **Saved version**:
-A recoverable copy of the document text associated with an iteration. It does not include proposals, discussions, or review decisions.
+A recoverable copy of the document text associated with a pass boundary. It does not include proposals, discussions, or review decisions. Versions is the user-facing command group for starting, resuming, and finishing passes, comparing saved text, and recovering earlier text; passes do not need a separate command group.
 
 **Outdated proposal**:
 A proposal whose target passage has changed since it was prepared. It needs review or regeneration before acceptance; edits elsewhere do not make it outdated.
