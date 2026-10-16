@@ -16,7 +16,9 @@ class MarginaliaError(Exception):
 
 class Workspace:
     def __init__(self, document: str | Path):
-        supplied = Path(document).absolute()
+        from marginalia.config import resolve_document
+
+        supplied = resolve_document(document).absolute()
         if supplied.is_symlink():
             raise MarginaliaError("Symlink documents are not supported.")
         self.document = supplied.resolve()

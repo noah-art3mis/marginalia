@@ -12,7 +12,7 @@ import typer
 from pydantic import ValidationError
 from rich.console import Console
 
-from marginalia import proposals, versions
+from marginalia import config, proposals, versions
 from marginalia.storage import MarginaliaError, Workspace
 
 app = typer.Typer(
@@ -26,8 +26,12 @@ version_app = typer.Typer(
 review_app = typer.Typer(
     help="Submit, inspect, discuss, and decide on proposals.", no_args_is_help=True
 )
+config_app = typer.Typer(
+    help="Save local vault paths and named drafts alongside Marginalia data.", no_args_is_help=True
+)
 app.add_typer(version_app, name="versions")
 app.add_typer(review_app, name="review")
+app.add_typer(config_app, name="config")
 console = Console(markup=False, highlight=False)
 Json = Annotated[bool, typer.Option("--json", help="Output structured data for agents.")]
 
@@ -77,7 +81,7 @@ def guide(topic: Annotated[str, typer.Argument()] = "workflow"):
 
 @app.command()
 @operation
-def status(document: Path, as_json: Json = False):
+def status(document: str, as_json: Json = False):
     """Inspect a document, active pass, proposals, versions, and editorial context."""
     ws = Workspace(document)
     with ws.locked():
@@ -103,10 +107,31 @@ def status(document: Path, as_json: Json = False):
     emit(result, as_json)
 
 
+@config_app.command("set")
+@operation
+def set_local(name: str, value: str, as_json: Json = False):
+    """Save vault or a named draft. Example: config set draft 'Folder/draft.md'."""
+    emit(config.set_value(name, value), as_json)
+
+
+@config_app.command("show")
+@operation
+def show_local(as_json: Json = False):
+    """Show the nearest local configuration and its file location."""
+    emit(config.show(), as_json)
+
+
+@config_app.command("unset")
+@operation
+def unset_local(name: str, as_json: Json = False):
+    """Remove a saved local value without changing any draft or versions."""
+    emit(config.unset_value(name), as_json)
+
+
 @version_app.command("start")
 @operation
 def start(
-    document: Path,
+    document: str,
     pass_type: Annotated[str, typer.Option("--type")],
     brief: str = "",
     as_json: Json = False,
@@ -117,28 +142,28 @@ def start(
 
 @version_app.command("finish")
 @operation
-def finish(document: Path, as_json: Json = False):
+def finish(document: str, as_json: Json = False):
     """Save the result and finish the active pass."""
     emit(versions.finish(Workspace(document)), as_json)
 
 
 @version_app.command("resume")
 @operation
-def resume(document: Path, as_json: Json = False):
+def resume(document: str, as_json: Json = False):
     """Inspect the active pass and continue it through the agent conversation."""
     emit(versions.resume(Workspace(document)), as_json)
 
 
 @version_app.command("save")
 @operation
-def save(document: Path, label: str = "", as_json: Json = False):
+def save(document: str, label: str = "", as_json: Json = False):
     """Save a text-only recovery version without finishing a pass."""
     emit(versions.save(Workspace(document), label), as_json)
 
 
 @version_app.command("list")
 @operation
-def list_versions(document: Path, as_json: Json = False):
+def list_versions(document: str, as_json: Json = False):
     """List recoverable text versions."""
     emit(versions.list_versions(Workspace(document)), as_json)
 
@@ -146,7 +171,7 @@ def list_versions(document: Path, as_json: Json = False):
 @version_app.command("compare")
 @operation
 def compare(
-    document: Path, version_id: str, other_id: Annotated[str | None, typer.Argument()] = None
+    document: str, version_id: str, other_id: Annotated[str | None, typer.Argument()] = None
 ):
     """Compare a saved version with current text or another saved version."""
     emit(versions.compare(Workspace(document), version_id, other_id))
@@ -154,7 +179,7 @@ def compare(
 
 @version_app.command("restore")
 @operation
-def restore(document: Path, version_id: str, as_json: Json = False):
+def restore(document: str, version_id: str, as_json: Json = False):
     """Restore saved text, preserving current text first. Requires author approval."""
     emit(versions.restore(Workspace(document), version_id), as_json)
 
@@ -168,7 +193,7 @@ def read_payload(path: Path):
 
 @review_app.command("submit")
 @operation
-def submit(document: Path, file: Annotated[Path, typer.Option("--file")], as_json: Json = False):
+def submit(document: str, file: Annotated[Path, typer.Option("--file")], as_json: Json = False):
     """Store a proposal without changing the document.
 
     Example: review submit draft.md --file p.json.
@@ -179,7 +204,7 @@ def submit(document: Path, file: Annotated[Path, typer.Option("--file")], as_jso
 @review_app.command("revise")
 @operation
 def revise(
-    document: Path,
+    document: str,
     proposal_id: str,
     file: Annotated[Path, typer.Option("--file")],
     as_json: Json = False,
@@ -190,14 +215,14 @@ def revise(
 
 @review_app.command("list")
 @operation
-def list_proposals(document: Path, as_json: Json = False):
+def list_proposals(document: str, as_json: Json = False):
     """List proposals and decisions, including outdated targets."""
     emit(proposals.list_proposals(Workspace(document)), as_json)
 
 
 @review_app.command("show")
 @operation
-def show(document: Path, proposal_id: str, mode: str = "diff", as_json: Json = False):
+def show(document: str, proposal_id: str, mode: str = "diff", as_json: Json = False):
     """Read one proposal as diff, Markdown comparison, or JSON."""
     if mode not in ("diff", "markdown"):
         raise MarginaliaError("Review mode must be diff or markdown.")
@@ -210,28 +235,28 @@ def show(document: Path, proposal_id: str, mode: str = "diff", as_json: Json = F
 
 @review_app.command("approve-cuts")
 @operation
-def approve_cuts(document: Path, proposal_id: str, as_json: Json = False):
+def approve_cuts(document: str, proposal_id: str, as_json: Json = False):
     """Record explicit author approval of declared information cuts without applying text."""
     emit(proposals.approve_cuts(Workspace(document), proposal_id), as_json)
 
 
 @review_app.command("accept")
 @operation
-def accept(document: Path, proposal_id: str, as_json: Json = False):
+def accept(document: str, proposal_id: str, as_json: Json = False):
     """Apply the reviewed proposal after explicit author approval and target validation."""
     emit(proposals.accept(Workspace(document), proposal_id), as_json)
 
 
 @review_app.command("reject")
 @operation
-def reject(document: Path, proposal_id: str, reason: str = "", as_json: Json = False):
+def reject(document: str, proposal_id: str, reason: str = "", as_json: Json = False):
     """Reject a proposal; a reason is optional and never becomes a global style rule."""
     emit(proposals.reject(Workspace(document), proposal_id, reason), as_json)
 
 
 @review_app.command("answer")
 @operation
-def answer(document: Path, proposal_id: str, answer_text: str, as_json: Json = False):
+def answer(document: str, proposal_id: str, answer_text: str, as_json: Json = False):
     """Answer an author query without approving a document change."""
     emit(proposals.answer(Workspace(document), proposal_id, answer_text), as_json)
 

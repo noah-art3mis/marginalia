@@ -1,83 +1,135 @@
 # Marginalia
 
-A local CLI for revising Markdown with a terminal agent. The agent proposes; you review and approve; Marginalia checks and applies the change. No model SDK or API key is required. You can keep writing in Obsidian or another editor.
+Revise Markdown drafts with Codex in a terminal while you read and write in Obsidian. Codex proposes changes, you discuss them, and Marginalia applies only the proposals you approve. It also saves versions so you can compare passes and recover earlier text.
 
-## Install and discover
+Marginalia runs locally. It has no chat window or Obsidian plugin and requires no separate model API key. You use your existing terminal agent.
 
-Requires Python 3.12+ and uv, on Linux, WSL, or macOS. File locking currently uses POSIX facilities; native Windows is not supported.
+## Your first editing pass
+
+If Marginalia is installed, open Codex in a terminal and give it the path to your note. Save the note in Obsidian first. For example:
+
+> Use Marginalia on `/path/to/vault/Essays/draft.md`. Start a tightening pass. Keep the examples and uncertainty. Propose a change to the first paragraph and show me before changing anything.
+
+Codex uses Marginalia to save the starting text and prepare a proposal. Read the original, suggested replacement, and explanation in the terminal. Then reply naturally:
+
+- “Keep the example. Try again with a smaller change.”
+- “Accept this proposal. Next paragraph.”
+- “Reject this one. Keep my wording.”
+- “Pause here. We’ll continue later.”
+
+You do not need to write proposal JSON or remember acceptance commands. Codex handles those operations in response to your decisions. Asking a question or discussing a suggestion does not approve it. Proposed information cuts, such as dropping an example or qualification, need separate approval.
+
+Save your Obsidian edits and pause typing before asking Codex to apply a proposal or restore a version. Marginalia checks the text saved on disk; it cannot see unsaved editor text or lock Obsidian. If the target passage has changed or become ambiguous, acceptance is blocked so you can request a fresh proposal. Edits elsewhere are retained.
+
+When you have gone through the document, say:
+
+> Finish this pass and show me what changed from the starting version.
+
+A **pass** is your traversal through the draft for a purpose, such as tightening or translating. A **version** is a saved copy of the text. Starting a pass saves the starting version; finishing saves the result. You can pause and resume a pass without starting over.
+
+## Remember your vault and note names
+
+Store local settings as plaintext files instead of repeating long paths. Run these commands from your vault folder, or ask Codex to set them up there:
 
 ```bash
-uv sync
-uv run marginalia
-uv tool install --editable .
-marginalia guide
-marginalia guide tighten
+cd /path/to/vault
+marginalia config set vault /path/to/vault
+marginalia config set obras 'Essays/draft.md'
+marginalia config show
+marginalia status @obras
 ```
 
-Running `marginalia` shows commands. Each command has `--help`; `marginalia guide` contains the agent's editorial workflow. Topic guides cover structure, cleanup, tightening, compaction, translation, and review. A thin [agent skill](skills/marginalia/SKILL.md) routes to that authoritative guidance. Install or link its folder into your agent's skill directory to make it discoverable.
+`obras` is a name you choose for the note. You can then tell Codex:
 
-## Work through a pass
+> Use Marginalia on `@obras`. Resume our tightening pass and show me the next proposal.
 
-```bash
-marginalia status draft.md --json
-marginalia versions start draft.md --type tighten --brief 'Keep the examples and uncertainty.'
-marginalia review schema
-marginalia review submit draft.md --file proposal.json
-marginalia review show draft.md p0001
-marginalia review show draft.md p0001 --mode markdown
-marginalia review accept draft.md p0001
-marginalia versions finish draft.md
-marginalia versions list draft.md
-marginalia versions compare draft.md v0001
-```
+The settings live in `.marginalia/config.json`. Marginalia finds that file by looking in the terminal's current folder and its parent folders. Start Codex from that folder or a child folder to use the saved names; they are not global shortcuts.
 
-An agent prepares `proposal.json`, for example:
+Relative note paths in these settings are resolved against `vault` when it is set, otherwise against the folder containing `.marginalia`. Ordinary document paths still resolve against the terminal's current folder. Any command that takes a document path also accepts `@obras` or another saved name.
 
-```json
-{
-  "kind": "replace",
-  "original": "It is possible that this could help.",
-  "replacement": "This could help.",
-  "explanation": "Remove repeated hedging while retaining uncertainty.",
-  "information_cuts": []
-}
-```
+Use `marginalia config unset obras` to remove a name. These are Marginalia settings, not shell environment variables.
 
-Submitting or revising a proposal does not change the draft. The author decides through the terminal conversation; the agent invokes `accept` only for an explicitly approved proposal. `reject` records an optional reason. `approve-cuts` records separate approval of declared substantive removals and does not itself apply text. Revising a proposal clears its cut approval. An `answer` to a query records clarification without changing the draft.
+## Other things you can ask for
 
-Targets must be exact, unique passages. Changed or ambiguous targets block acceptance; unrelated edits are retained. Target tracking is conservative: changing both surrounding contexts can make an unchanged passage outdated. Review it and submit a revised proposal rather than forcing acceptance. The CLI cannot prove semantic preservation or detect undeclared information cuts; the author and agent must inspect the actual wording.
+For a rough draft, begin with structure:
 
-Save unsaved editor changes and pause other writers before accepting or restoring. Marginalia serializes its own commands, checks disk text again before replacement, and keeps recovery copies. Its lock does not control Obsidian or another editor; unsaved buffers and an external writer racing the final check are outside that protection.
+> Propose headings for this draft. After I approve them, suggest where each passage belongs. Keep the wording unchanged and ask me about ambiguous placements.
 
-## Structure without rewriting
+Codex can propose headings and moves separately. Marginalia moves the exact passage, including its links and citations. Review shows its source and destination rather than presenting the move as a rewrite.
 
-Use `marginalia guide structure` to agree on headings before reorganizing. An `insert` proposal adds a heading before an existing passage without replacing that passage. A `move` proposal relocates an unchanged exact passage before a unique destination anchor, retaining all its characters, links, and citations. Include the desired paragraph separators in the passage. An author query resolves ambiguous classification. Review shows moves as source and destination rather than disguising them as large rewrites.
+For later passes, ask for cleanup, tightening, compaction, or translation and explain what must be preserved. You control the scope and pace; choosing a pass type does not authorize a whole-document rewrite.
 
-The CLI provides literal terminal comparisons and plain-Markdown review output. An interactive diff picker, typed triggers, and an Obsidian interface are not implemented. Decisions are made through the agent conversation. Existing exploratory [issues](https://github.com/noah-art3mis/marginalia/issues) remain separate from this implementation.
+To revisit earlier work, ask:
 
-## Versions and visible state
+> Show the saved versions and compare the current draft with the start of the last pass.
 
-Versions is the command group for starting, resuming, and finishing passes, saving text, comparing versions, and restoring earlier drafts. A pass is the author-controlled traversal through a document; a version is saved text at a boundary. Restore saves current text first, interrupts the active pass, and marks pending proposals outdated. It preserves rejected and accepted decisions.
+Restoring a version saves the current text first, interrupts the active pass, and marks pending proposals outdated. Accepted and rejected decisions remain recorded. The CLI checks text preservation for moves, but it cannot determine whether a rewrite changes meaning or contains an undeclared information cut. Read the proposal before approving it.
 
-For `draft.md`, state is beside the document:
+## Where your files live
+
+Your draft stays an ordinary Markdown file. For `Essays/draft.md`, Marginalia stores its review state and saved text beside it:
 
 ```text
-.marginalia/draft.md/
-  state.json
-  proposals/p0001.json
-  versions/v0001.md
-  recovery/...
+Essays/
+  draft.md
+  .marginalia/
+    draft.md/
+      state.json
+      proposals/p0001.json
+      versions/v0001.md
+      recovery/...
 ```
 
-Versions contain only document text. JSON files contain pass and review state and are inspectable with ordinary tools. Do not edit workspace files while commands are running. Invalid state is reported; it is not silently reset. Leave an interrupted transaction journal and recovery files intact until the next command completes recovery or explains a conflict.
+Versions contain only document text. Pass details and review decisions are stored in inspectable JSON files. Optional `brief.md`, `style.md`, and `notes.md` files inside the document workspace hold author-owned context; `marginalia status` shows their contents and the workspace location.
 
-The brief is stored with its pass in `state.json`. Optional author-owned `brief.md`, `style.md`, and `notes.md` files inside the workspace are surfaced by `status`. Rejections remain in proposal files; exact rejected suggestions cannot be resubmitted in the same pass. Equivalent rewordings are not mechanically detected; agents consult previous decisions. A local rejection never automatically becomes a global style rule.
+The folder settings file is separate from each document's workspace. If you configure Marginalia from your vault folder, settings and document workspaces are both within the vault. If you configure it from a different terminal project folder, its settings stay there while each document's versions and proposals stay beside that document.
 
-See [GLOSSARY.md](GLOSSARY.md) for domain terms, [AGENTS.md](AGENTS.md) for repository workflow, and [CODING_STANDARDS.md](CODING_STANDARDS.md) for review criteria.
+Do not manually edit state while a command is running. Invalid state produces an error rather than being silently reset. Keep recovery files and any interrupted transaction journal intact until Marginalia completes recovery or explains a conflict.
+
+## Install
+
+Requires Python 3.12+ and [uv](https://docs.astral.sh/uv/), on Linux, WSL, or macOS. Native Windows is not supported; on Windows, run Marginalia and Codex inside WSL.
+
+From this repository:
+
+```bash
+uv tool install --editable .
+marginalia
+marginalia guide
+```
+
+The bundled [agent skill](skills/marginalia/SKILL.md) tells Codex to load Marginalia's workflow guidance. Install or link its folder into your agent's skill directory. If the skill is not available in a session, tell Codex to run `marginalia guide` before working on your draft.
+
+## Commands when you need them
+
+Running `marginalia` shows the available commands. Each command has `--help`. The bundled guides explain the editorial workflow:
+
+```bash
+marginalia guide
+marginalia guide structure
+marginalia guide tighten
+marginalia guide review
+```
+
+You can also inspect state directly:
+
+```bash
+marginalia status @obras
+marginalia review list @obras
+marginalia review show @obras p0001
+marginalia review show @obras p0001 --mode markdown
+marginalia versions list @obras
+marginalia versions compare @obras v0001
+```
+
+Proposal commands support terminal comparisons and plain-Markdown review output. Decisions happen through your agent conversation. An interactive diff picker and typed triggers are not implemented. The exploratory [issues](https://github.com/noah-art3mis/marginalia/issues) describe possible additions.
+
+For tool integrations, `marginalia review schema` describes proposal inputs. Many state commands offer `--json` output. Normal author use does not require preparing those files manually.
 
 ## Development
 
 ```bash
+uv sync
 uv run pytest -q --tb=short -x
 uv run ruff check --quiet
 uv run ruff format --check
@@ -86,6 +138,8 @@ uv run ruff format --check
 Tests use synthetic drafts and exercise proposal acceptance, content-preserving moves, author edits, cut approval, versions, locking, and recovery. No real draft or paid model run is needed.
 
 The [recorded agent forward test](tests/evidence/guide-forward-test.json) includes synthetic author requests, actual proposals and responses, CLI output, source hashes, and reproduction instructions. It checked that the candidate guides preserve uncertainty and withhold unapproved edits. It is an initial workflow check without a previous baseline or a cross-model editorial-quality claim.
+
+See [GLOSSARY.md](GLOSSARY.md) for domain terms, [AGENTS.md](AGENTS.md) for repository workflow, and [CODING_STANDARDS.md](CODING_STANDARDS.md) for review criteria.
 
 ## License
 
