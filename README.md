@@ -139,6 +139,8 @@ Tests use synthetic drafts and exercise proposal acceptance, content-preserving 
 
 The [recorded agent forward test](tests/evidence/guide-forward-test.json) includes synthetic author requests, actual proposals and responses, CLI output, source hashes, and reproduction instructions. It checked that the candidate guides preserve uncertainty and withhold unapproved edits. It is an initial workflow check without a previous baseline or a cross-model editorial-quality claim.
 
+The [structural conversation replay](tests/evidence/structure-guide-replay.json) compares baseline and candidate guides using [reusable synthetic cases](tests/fixtures/guide-conversation.json). It checks before/after outlines, technical register, authorized heading changes and passage moves, editor conflicts, and the existing uncertainty-preservation cases. The record includes actual responses, operations, source hashes, results, and evaluation limits; it does not establish behavior across models or in a live editor.
+
 See [GLOSSARY.md](GLOSSARY.md) for domain terms, [AGENTS.md](AGENTS.md) for repository workflow, and [CODING_STANDARDS.md](CODING_STANDARDS.md) for review criteria.
 
 ## License

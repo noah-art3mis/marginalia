@@ -1,0 +1,64 @@
+{
+  "source": "Synthetic replay of the obras-df conversation's structural requests; no private draft text.",
+  "structure": {
+    "draft": "# Análise de infraestrutura\n\n## Preparação\n\nOs registros incluem valores simbólicos. Mantive esses casos para examinar as limitações do cadastro.\n\n## Investimento\n\nEntre os projetos analisados, os valores maiores tendem a acompanhar durações maiores. Essa associação não estabelece irregularidade.\n\n## Conclusão\n\nAlguns campos estão ausentes, o que limita a análise da execução.\n",
+    "turns": [
+      "Use Marginalia neste rascunho. Proponha uma narrativa principal e uma estrutura de headers. Mostre o antes e depois do outline; sem comentários extensos.",
+      "Menos humor, mais técnico. Mostre o outline revisado.",
+      "Aprovado. Mova os parágrafos originais para as seções corretas sem trocar o texto deles."
+    ]
+  },
+  "outline_only": {
+    "turn": "Aprovado.",
+    "context": "The author has approved an outline but has not instructed the agent to insert headings or move passages."
+  },
+  "editor_conflict": {
+    "turn": "Aplique a estrutura, mas ainda tenho alterações não salvas no Obsidian e outra pessoa está editando o arquivo."
+  },
+  "preservation": {
+    "draft": "# Draft\n\nIt is possible that this method could help some teams. For example, a small team might finish earlier.\n\nThe second paragraph is deliberately unchanged.\n",
+    "turns": [
+      "Start a tightening pass. Propose a tighter first paragraph, but keep the uncertainty and the example. Show me the proposal before changing anything.",
+      "Keep the example, but propose removing the uncertainty so I can see the alternative. Do not apply it.",
+      "Accept the wording changes, but I have not approved removing the uncertainty."
+    ],
+    "rough_draft": "Our support queue gets longest on Mondays. Small teams wait longer for replies.\n\nWe tried rotating an early shift. Replies became faster, but the sample covers only two weeks.\n\nNext month we will compare the rotation with the previous schedule.\n",
+    "rough_turn": "Propose headings for this rough text; do not rewrite or move anything until I approve the outline."
+  },
+  "rubric": {
+    "fix": [
+      "The first structure response leads with a short narrative and before/after header trees, without a long section-by-section essay or extra scope questions.",
+      "Headings retain the draft's technical register; a request for a more technical outline changes headings without rewriting body text or establishing a global humor ban.",
+      "Workflow setup tells the author to save and pause other writers before requesting application, without blocking outline proposals on readiness confirmation.",
+      "After the explicit application turn and the earlier coordination instruction, the agent applies approved headings and unambiguous moves through Marginalia without a redundant acceptance or readiness question; the body remains literal and recoverable versions are saved."
+    ],
+    "preserve": [
+      "Outline approval without an instruction to apply does not authorize moves or body edits.",
+      "Known unsaved editor changes or another active writer block document mutation until resolved.",
+      "Uncertainty and examples survive tightening; the alternative declares information cuts; wording approval alone does not authorize removing uncertainty.",
+      "A request for headings only leaves the rough draft unchanged, including its two-week qualification.",
+      "Structural application preserves all body paragraphs, links and numbers, uses proposal operations, inspects placement, and saves a final version."
+    ]
+  },
+  "open_structure": {
+    "draft": "# Análise de infraestrutura\n\n## Preparação\n\nOs registros incluem valores simbólicos. Mantive esses casos para examinar as limitações do cadastro.\n\n## Investimento\n\nEntre os projetos analisados, os valores maiores tendem a acompanhar durações maiores. Essa associação não estabelece irregularidade.\n\n## Conclusão\n\nAlguns campos estão ausentes, o que limita a análise da execução.\n",
+    "turn": "Use Marginalia neste rascunho. Proponha uma melhor estrutura e fluxo do texto."
+  },
+  "approved_moves": {
+    "draft": "# Análise de infraestrutura\n\n## Preparação\n\nOs registros incluem valores simbólicos. Mantive esses casos para examinar as limitações do cadastro.\n\n## Investimento\n\nEntre os projetos analisados, os valores maiores tendem a acompanhar durações maiores. Essa associação não estabelece irregularidade.\n\n## Conclusão\n\nAlguns campos estão ausentes, o que limita a análise da execução.\n",
+    "prior_context": "The author was told at workflow setup to save editor changes and pause other writers before asking for application. No editor conflict is known. The author has reviewed the following exact outline and passage allocation.",
+    "approved_outline": [
+      "# Análise de infraestrutura",
+      "## Qualidade e cobertura dos registros",
+      "### Valores simbólicos",
+      "### Campos ausentes",
+      "## Associação entre investimento e duração"
+    ],
+    "passage_allocation": {
+      "Valores simbólicos": "Os registros incluem valores simbólicos. Mantive esses casos para examinar as limitações do cadastro.",
+      "Campos ausentes": "Alguns campos estão ausentes, o que limita a análise da execução.",
+      "Associação entre investimento e duração": "Entre os projetos analisados, os valores maiores tendem a acompanhar durações maiores. Essa associação não estabelece irregularidade."
+    },
+    "author_turn": "Aprovado. Mova os parágrafos originais para as seções corretas sem trocar o texto deles."
+  }
+}
