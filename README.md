@@ -26,6 +26,10 @@ Typed paragraph triggers, Markdown blockquotes, and Obsidian callouts are intera
 
 See the [glossary](GLOSSARY.md) for domain terms. Architecture, storage format, and the initial prototype remain open design decisions.
 
+## Contributing
+
+Read [AGENTS.md](AGENTS.md) for repository workflow and Git authorization, and [CODING_STANDARDS.md](CODING_STANDARDS.md) for review criteria.
+
 ## License
 
 [MIT](LICENSE), copyright 2026 Gustavo Costa.
