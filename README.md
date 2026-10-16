@@ -1,34 +1,91 @@
 # Marginalia
 
-Obsidian toolkit for AI-assisted Markdown editing, with reviewable changes and versioned drafts.
+A local CLI for revising Markdown with a terminal agent. The agent proposes; you review and approve; Marginalia checks and applies the change. No model SDK or API key is required. You can keep writing in Obsidian or another editor.
 
-Marginalia is in the design stage. There is no installable plugin yet. Follow the [design and feature issues](https://github.com/noah-art3mis/marginalia/issues) for current work.
+## Install and discover
 
-## Intended workflow
+Requires Python 3.12+ and uv, on Linux, WSL, or macOS. File locking currently uses POSIX facilities; native Windows is not supported.
 
-1. Start with a large, loosely structured Markdown draft. Ask an agent to propose headings, then classify and move existing passages beneath the agreed headings without rewriting their content.
-2. Choose an editing pass, such as cleanup, tightening, compaction, or translation. Add a short editorial brief describing the intended voice, permitted changes, and content to preserve.
-3. Work through the document at your own pace. The agent proposes changes; you inspect, discuss, accept, or reject them. Planned review modes include plain-Markdown proposals and an interactive diff.
-4. Use Versions to start, resume, or finish a pass, compare saved text, and recover earlier text. Save recoverable document text at author-controlled pass boundaries.
+```bash
+uv sync
+uv run marginalia
+uv tool install --editable .
+marginalia guide
+marginalia guide tighten
+```
 
-A paragraph rewrite can be one proposal accepted or rejected as a whole. Accepting a proposal and then editing the resulting text is sufficient. Removing substantive information, including examples and qualifications, requires explicit approval separate from accepting wording changes.
+Running `marginalia` shows commands. Each command has `--help`; `marginalia guide` contains the agent's editorial workflow. Topic guides cover structure, cleanup, tightening, compaction, translation, and review. A thin [agent skill](skills/marginalia/SKILL.md) routes to that authoritative guidance. Install or link its folder into your agent's skill directory to make it discoverable.
 
-## Design commitments
+## Work through a pass
 
-- Preserve the author's wording during classification and reorganization.
-- Keep proposed changes observable and require approval before applying them.
-- Detect when a proposal's target passage has changed rather than overwriting newer writing.
-- Preserve editorial decisions when suggestions refresh. A local rejection does not silently become a permanent style rule.
-- Make the editorial brief, optional style sheet, decision memory, and other project context visible and accessible to both the author and agent tools.
-- Keep saved document versions limited to document text, separate from proposals and review metadata.
+```bash
+marginalia status draft.md --json
+marginalia versions start draft.md --type tighten --brief 'Keep the examples and uncertainty.'
+marginalia review schema
+marginalia review submit draft.md --file proposal.json
+marginalia review show draft.md p0001
+marginalia review show draft.md p0001 --mode markdown
+marginalia review accept draft.md p0001
+marginalia versions finish draft.md
+marginalia versions list draft.md
+marginalia versions compare draft.md v0001
+```
 
-Typed paragraph triggers, Markdown blockquotes, and Obsidian callouts are interaction ideas to explore. Their syntax and implementation are not settled. An external coding agent in a terminal is a valid integration direction; an embedded chat interface is not required.
+An agent prepares `proposal.json`, for example:
 
-See the [glossary](GLOSSARY.md) for domain terms. Architecture, storage format, and the initial prototype remain open design decisions.
+```json
+{
+  "kind": "replace",
+  "original": "It is possible that this could help.",
+  "replacement": "This could help.",
+  "explanation": "Remove repeated hedging while retaining uncertainty.",
+  "information_cuts": []
+}
+```
 
-## Contributing
+Submitting or revising a proposal does not change the draft. The author decides through the terminal conversation; the agent invokes `accept` only for an explicitly approved proposal. `reject` records an optional reason. `approve-cuts` records separate approval of declared substantive removals and does not itself apply text. Revising a proposal clears its cut approval. An `answer` to a query records clarification without changing the draft.
 
-Read [AGENTS.md](AGENTS.md) for repository workflow and Git authorization, and [CODING_STANDARDS.md](CODING_STANDARDS.md) for review criteria.
+Targets must be exact, unique passages. Changed or ambiguous targets block acceptance; unrelated edits are retained. Target tracking is conservative: changing both surrounding contexts can make an unchanged passage outdated. Review it and submit a revised proposal rather than forcing acceptance. The CLI cannot prove semantic preservation or detect undeclared information cuts; the author and agent must inspect the actual wording.
+
+Save unsaved editor changes and pause other writers before accepting or restoring. Marginalia serializes its own commands, checks disk text again before replacement, and keeps recovery copies. Its lock does not control Obsidian or another editor; unsaved buffers and an external writer racing the final check are outside that protection.
+
+## Structure without rewriting
+
+Use `marginalia guide structure` to agree on headings before reorganizing. An `insert` proposal adds a heading before an existing passage without replacing that passage. A `move` proposal relocates an unchanged exact passage before a unique destination anchor, retaining all its characters, links, and citations. Include the desired paragraph separators in the passage. An author query resolves ambiguous classification. Review shows moves as source and destination rather than disguising them as large rewrites.
+
+The CLI provides literal terminal comparisons and plain-Markdown review output. An interactive diff picker, typed triggers, and an Obsidian interface are not implemented. Decisions are made through the agent conversation. Existing exploratory [issues](https://github.com/noah-art3mis/marginalia/issues) remain separate from this implementation.
+
+## Versions and visible state
+
+Versions is the command group for starting, resuming, and finishing passes, saving text, comparing versions, and restoring earlier drafts. A pass is the author-controlled traversal through a document; a version is saved text at a boundary. Restore saves current text first, interrupts the active pass, and marks pending proposals outdated. It preserves rejected and accepted decisions.
+
+For `draft.md`, state is beside the document:
+
+```text
+.marginalia/draft.md/
+  state.json
+  proposals/p0001.json
+  versions/v0001.md
+  recovery/...
+```
+
+Versions contain only document text. JSON files contain pass and review state and are inspectable with ordinary tools. Do not edit workspace files while commands are running. Invalid state is reported; it is not silently reset. Leave an interrupted transaction journal and recovery files intact until the next command completes recovery or explains a conflict.
+
+The brief is stored with its pass in `state.json`. Optional author-owned `brief.md`, `style.md`, and `notes.md` files inside the workspace are surfaced by `status`. Rejections remain in proposal files; exact rejected suggestions cannot be resubmitted in the same pass. Equivalent rewordings are not mechanically detected; agents consult previous decisions. A local rejection never automatically becomes a global style rule.
+
+See [GLOSSARY.md](GLOSSARY.md) for domain terms, [AGENTS.md](AGENTS.md) for repository workflow, and [CODING_STANDARDS.md](CODING_STANDARDS.md) for review criteria.
+
+## Development
+
+```bash
+uv run pytest -q --tb=short -x
+uv run ruff check --quiet
+uv run ruff format --check
+```
+
+Tests use synthetic drafts and exercise proposal acceptance, content-preserving moves, author edits, cut approval, versions, locking, and recovery. No real draft or paid model run is needed.
+
+The [recorded agent forward test](tests/evidence/guide-forward-test.json) includes synthetic author requests, actual proposals and responses, CLI output, source hashes, and reproduction instructions. It checked that the candidate guides preserve uncertainty and withhold unapproved edits. It is an initial workflow check without a previous baseline or a cross-model editorial-quality claim.
 
 ## License
 
