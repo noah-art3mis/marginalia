@@ -292,7 +292,7 @@ def test_adding_a_new_paragraph_keeps_a_single_paragraph_proposal_usable(tmp_pat
 
 def test_move_revalidates_nonoverlap_after_author_changes_separators(tmp_path):
     path = tmp_path / "draft.md"
-    path.write_text("ABC\n\nBCD")
+    path.write_text("ABC\n\nX\n\nBCD")
     ws = Workspace(path)
     versions.start(ws, "structure")
     proposal = proposals.submit(
@@ -308,3 +308,31 @@ def test_move_revalidates_nonoverlap_after_author_changes_separators(tmp_path):
     with pytest.raises(MarginaliaError, match="overlap"):
         proposals.accept(ws, proposal["id"])
     assert path.read_text() == "ABCD"
+
+
+def test_move_of_a_bare_paragraph_keeps_paragraph_breaks_on_both_sides(draft):
+    p = proposals.submit(
+        draft,
+        dict(
+            kind="move",
+            original="A long example with uncertainty.",
+            destination="Last paragraph.",
+            explanation="Place under end without gluing paragraphs.",
+        ),
+    )
+    proposals.accept(draft, p["id"])
+    expected = "# Start\n\n# End\n\nA long example with uncertainty.\n\nLast paragraph.\n"
+    assert draft.read_text() == expected
+
+
+def test_move_of_a_bare_paragraph_already_before_destination_is_a_noop(draft):
+    with pytest.raises(MarginaliaError, match="already"):
+        proposals.submit(
+            draft,
+            dict(
+                kind="move",
+                original="A long example with uncertainty.",
+                destination="# End",
+                explanation="No actual change.",
+            ),
+        )

@@ -17,7 +17,8 @@ def test_default_guide_exposes_bundled_workflow_without_requiring_a_document():
 
 
 @pytest.mark.parametrize(
-    "topic", ["structure", "tighten", "compact", "cleanup", "translate", "review", "verify", "dedupe"]
+    "topic",
+    ["structure", "tighten", "compact", "cleanup", "translate", "review", "verify", "dedupe"],
 )
 def test_each_workflow_topic_is_accessible_to_an_external_agent(topic):
     result = runner.invoke(app, ["guide", topic])

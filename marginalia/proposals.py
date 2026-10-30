@@ -88,11 +88,20 @@ def _move_spans(text, payload):
     start = _unique(text, payload["original"])
     dest = _unique(text, payload["destination"])
     end = start + len(payload["original"])
+    block = payload["original"]
+    at_line_start = start == 0 or text[start - 1] == "\n"
+    at_line_end = end == len(text) or text[end] == "\n"
+    if at_line_start and at_line_end and not block.endswith("\n"):
+        # A whole-line passage given without its separator moves as a block: the
+        # blank line after it travels along, so neither site is glued or doubly spaced.
+        rest = text[end:]
+        end += len(rest) - len(rest.lstrip("\n"))
+        block += "\n\n"
     if dest == end:
         raise MarginaliaError("Passage is already immediately before this destination.")
     if start <= dest < end or dest <= start < dest + len(payload["destination"]):
         raise MarginaliaError("Move source and destination must not overlap.")
-    return start, end, dest
+    return start, end, dest, block
 
 
 def _evidence(text, payload):
@@ -228,12 +237,11 @@ def accept(ws, identifier) -> dict:
         if proposal["information_cuts"] and not proposal["cuts_approved"]:
             raise MarginaliaError("Information cuts require separate explicit approval.")
         if proposal["kind"] == "move":
-            original = proposal["original"]
-            start, end, dest = _move_spans(text, proposal)
+            start, end, dest, block = _move_spans(text, proposal)
             if dest < start:
-                changed = text[:dest] + original + text[dest:start] + text[end:]
+                changed = text[:dest] + block + text[dest:start] + text[end:]
             else:
-                changed = text[:start] + text[end:dest] + original + text[dest:]
+                changed = text[:start] + text[end:dest] + block + text[dest:]
         elif proposal["kind"] == "insert":
             changed = text.replace(
                 proposal["original"], proposal["replacement"] + proposal["original"], 1
