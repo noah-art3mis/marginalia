@@ -57,7 +57,7 @@ For a rough draft, begin with structure:
 
 Codex can propose headings and moves separately. Marginalia moves the exact passage, including its links and citations. Review shows its source and destination rather than presenting the move as a rewrite.
 
-For later passes, ask for cleanup, tightening, compaction, or translation and explain what must be preserved. You control the scope and pace; choosing a pass type does not authorize a whole-document rewrite.
+For later passes, ask for cleanup, tightening, compaction, deduplication, verification of references and assertions, or translation and explain what must be preserved. You control the scope and pace; choosing a pass type does not authorize a whole-document rewrite.
 
 To revisit earlier work, ask:
 

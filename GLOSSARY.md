@@ -13,7 +13,7 @@ An agent's suggested change that the author can inspect and discuss before decid
 _Avoid_: Applied edit, automatic rewrite
 
 **Pass type**:
-The purpose guiding a pass, such as compacting, tightening, translating, or cleaning up. The author directs the agent’s edits during the pass.
+The purpose guiding a pass, such as compacting, tightening, deduplicating, verifying, translating, or cleaning up. The author directs the agent’s edits during the pass.
 
 **Information cut**:
 A proposed removal of a claim, example, qualification, uncertainty, or other substantive content. It requires explicit approval distinct from accepting wording changes.

@@ -1,6 +1,6 @@
 # Tighten wording
 
-Read the active brief, current passage, surrounding argument, and relevant decisions. Tightening removes unnecessary words and improves sentence construction while preserving the author's meaning, voice, examples, qualifications, and uncertainty. Do not replace deliberate technical distinctions with smoother but less precise language.
+Read the active brief, current passage, surrounding argument, and relevant decisions. Tightening removes unnecessary words and improves sentence construction while preserving the author's meaning, voice, examples, qualifications, and uncertainty. Do not replace deliberate technical distinctions with smoother but less precise language. Tightening includes deduplication: an idea stated twice within a passage, or repeated verbatim from an earlier one, is merged into a single statement; follow `marginalia guide dedupe` for pairs that sit sections apart.
 
 Propose one manageable passage at a time. Show its original and replacement, and explain the wording changes briefly. Check links, citations, numbers, negations, and the strength of claims against the source. A shorter paragraph is not sufficient evidence of a better paragraph.
 

@@ -4,7 +4,7 @@ Marginalia supplies document operations and recoverable text versions. You suppl
 
 ## Orient before proposing
 
-Run `marginalia status DOCUMENT` and inspect its structured output with `--json` when needed. Read the current document, active pass, pending proposals, and recorded decisions before continuing. Use `marginalia guide TOPIC` for `structure`, `tighten`, `compact`, `cleanup`, `translate`, or `review`. Consult command `--help` for exact arguments and proposal formats.
+Run `marginalia status DOCUMENT` and inspect its structured output with `--json` when needed. Read the current document, active pass, pending proposals, and recorded decisions before continuing. Use `marginalia guide TOPIC` for `structure`, `tighten`, `compact`, `dedupe`, `verify`, `cleanup`, `translate`, or `review`. A draft headed for publication usually runs cleanup, structure, tighten, then verify. Consult command `--help` for exact arguments and proposal formats.
 
 Agree on the pass type and a short editorial brief: audience, scope, voice, permitted intervention, and protected content. Make the brief visible to the author. Status reports the active pass brief and author-managed `brief.md`, `style.md`, and `notes.md` files when present in the displayed storage directory. Read those files as shared context; if a note conflicts with the current brief, ask the author. Absence of a style sheet must not prevent work. Do not invent hidden preferences or promote a rejected suggestion into a permanent style rule.
 
